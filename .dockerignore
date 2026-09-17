@@ -1,0 +1,17 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+node_modules
+test-results
+playwright-report
+supabase/.branches
+supabase/.temp
+warehouse-project/inputs
+warehouse-project/data
+tests
+scripts
+docs
+*.md
+github-test.txt

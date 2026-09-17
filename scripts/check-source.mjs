@@ -12,5 +12,8 @@ for(const p of files(dist).filter(p=>/\.(html|css)$/.test(p))){
 }
 for(const file of ['warehouse-api.js','warehouse-management.js'])assert.ok(!/localStorage|sessionStorage/.test(readFileSync(resolve(dist,file),'utf8')),`Persistent browser session storage: ${file}`);
 assert.match(readFileSync(resolve(root,'supabase/config.toml'),'utf8'),/verify_jwt\s*=\s*true/);
-const config=readFileSync(resolve(dist,'warehouse-config.js'),'utf8');assert.ok(!/service_role|sb_secret_/.test(config));
-console.log('JavaScript syntax, static asset paths, gateway verification and no browser-persisted sessions: PASS');
+for(const configPath of [resolve(dist,'warehouse-config.js'),resolve(root,'docker/warehouse-config.js')]){
+ const config=readFileSync(configPath,'utf8');
+ assert.ok(!/service_role|sb_secret_|SUPABASE_SERVICE_ROLE_KEY/.test(config),`Privileged key marker in ${relative(root,configPath)}`);
+}
+console.log('JavaScript syntax, static asset paths, gateway verification, browser key boundary and no browser-persisted sessions: PASS');

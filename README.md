@@ -1,15 +1,24 @@
-# warehouse-progect
+# Warehouse management
 
-## Warehouse management candidate
+نظام إدارة مستودع عربي RTL يحافظ على الخريطة والصناديق والصور والبحث والباركود، مع Supabase/PostgreSQL وEdge Function محمية. النسخة الحالية جاهزة للتشغيل المحلي/الذاتي عبر Docker على Windows؛ لم يتغير `main` أو الموقع الحي.
 
-The management system lives on `feature/warehouse-management`; the live Pages deployment is unchanged.
-See [Arabic setup, features and verification report](docs/warehouse-management.md) and [inventory review](docs/inventory-review.md).
+## تشغيل Windows
 
-```sh
+```powershell
+Copy-Item .env.example .env
+notepad .env
+docker compose up --detach --build --wait
+Start-Process http://localhost:8080
+```
+
+ضع في `.env` رابط Supabase وpublishable key فقط. **لا تضع `service_role` أو secret key.** للتفاصيل وHTTPS والإيقاف راجع [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## التحقق
+
+```powershell
 npm ci --ignore-scripts
 npm run check
 npm test
-python -m http.server 8000 --directory warehouse-project/site/dist
 ```
 
-Open http://localhost:8000/ to test against the isolated Supabase staging project. Local manual actions persist to staging; automated tests use an isolated temporary database.
+ابدأ من [PROJECT_STATE.md](PROJECT_STATE.md) للحالة الحالية، و[ARCHITECTURE.md](ARCHITECTURE.md) للبنية، و[SECURITY.md](SECURITY.md) للمراجعة الأمنية. تعليمات المساهمة الإلزامية في [AGENTS.md](AGENTS.md)، وتفاصيل المخزون في [docs/inventory-review.md](docs/inventory-review.md).

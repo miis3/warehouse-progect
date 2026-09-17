@@ -1,0 +1,30 @@
+# Changelog
+
+كل التغييرات المهمة في هذا المشروع موثقة هنا. التواريخ بصيغة ISO.
+
+## 2026-09-17 — Production-ready Windows branch
+
+### Added
+
+- `AGENTS.md` وعائلة ملفات الحقيقة للتشغيل والصيانة والتسليم.
+- صورة Caddy ثابتة و`compose.yaml` و`.env.example` لتشغيل Windows بأمر واحد.
+- same-origin reverse proxy إلى Supabase، healthcheck، ضغط، رؤوس أمنية، ودعم HTTPS الذاتي.
+- اختبارات بنية الإنتاج وRLS/فهارس المفاتيح الأجنبية.
+- migration additive لفهارس `loans.unit_id`, sessions actor, وrate-limit retention.
+- CI لبناء الحاوية وفحصها دون نشر.
+
+### Changed
+
+- فحص المصدر يغطي إعداد Docker ويمنع مؤشرات مفاتيح الامتياز في browser config.
+- Workflow الاختبارات يعمل على كل الفروع وpull requests إلى `main`.
+
+### Preserved
+
+- الواجهة RTL والخريطة والصناديق والبحث والصور والباركود وجميع البيانات المصدرية.
+- Supabase migrations السابقة، RLS، صلاحيات RPC، وسلوك Edge Function.
+- Workflow النشر الحي المقيد بـ`main`; لم يحدث نشر.
+
+### Architecture decision
+
+- لم يُعتمد Next.js لأن فائدته الحالية لا تبرر إعادة كتابة واجهة مستقرة.
+- أُضيف Caddy لاستخدام فعلي في التقديم وreverse proxy والأمان وHTTPS، لا كاعتماد شكلي.

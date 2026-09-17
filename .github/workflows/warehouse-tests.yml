@@ -1,7 +1,7 @@
 name: Warehouse management tests
 on:
   push:
-    branches: [feature/warehouse-management]
+    branches: ["**"]
   pull_request:
     branches: [main]
 permissions:
@@ -14,8 +14,27 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run check
       - run: npm test
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose configuration
+        run: docker compose --env-file .env.example config --quiet
+      - name: Build and smoke-test the production container
+        run: |
+          docker compose --env-file .env.example up --detach --build --wait
+          curl --fail --silent --show-error http://127.0.0.1:8080/healthz
+          curl --fail --silent --show-error http://127.0.0.1:8080/ | grep -q 'المستودع التفاعلي'
+          curl --fail --silent --show-error http://127.0.0.1:8080/warehouse-config.js | grep -q '/api/warehouse'
+      - name: Container logs
+        if: failure()
+        run: docker compose --env-file .env.example logs
+      - name: Stop test container
+        if: always()
+        run: docker compose --env-file .env.example down --volumes
