@@ -1,0 +1,6 @@
+project_id = "warehouse-management"
+
+[functions.warehouse-api]
+# Keep gateway JWT verification enabled. Private operations ALSO require the
+# opaque warehouse session and database role/ownership checks.
+verify_jwt = true

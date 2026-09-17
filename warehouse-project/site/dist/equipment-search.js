@@ -1,5 +1,5 @@
 // Index only inventory with an assigned location; exclude the demonstration case.
-const equipmentSearchIndex = bravoBoxes.flatMap(box => {
+function buildEquipmentSearchIndex() { return (window.warehouseAllBoxes?window.warehouseAllBoxes():bravoBoxes).flatMap(box => {
   const entries = [];
   function visit(items, parentName = '', mainIndex = null) {
     items.forEach((item, index) => {
@@ -10,7 +10,9 @@ const equipmentSearchIndex = bravoBoxes.flatMap(box => {
   }
   visit(contentsFor(box)?.items || []);
   return entries;
-});
+}); }
+let equipmentSearchIndex=buildEquipmentSearchIndex();
+window.addEventListener('warehouse-catalog',()=>{equipmentSearchIndex=buildEquipmentSearchIndex();updateEquipmentResults();});
 function normalizeEquipmentName(value) {
   return String(value).normalize('NFKC').toLowerCase()
     .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
@@ -28,14 +30,14 @@ const equipmentSearch = document.getElementById('equipment-search');
 equipmentSearch.innerHTML = `
   <label for="equipment-query">البحث عن معدة</label>
   <div class="equipment-search-controls"><input id="equipment-query" type="search" autocomplete="off" placeholder="اكتب اسم المعدة أو جزءًا منه" aria-describedby="equipment-search-help" aria-controls="equipment-results"><button id="equipment-search-clear" type="button">مسح البحث</button></div>
-  <p id="equipment-search-help" class="note">البحث في المعدات والملحقات المسجلة بمواقعها في برافو.</p>
+  <p id="equipment-search-help" class="note">البحث في المعدات والملحقات المسجلة بمواقعها في المستودع.</p>
   <p id="equipment-search-status" role="status" aria-live="polite" aria-atomic="true"></p>
   <ul id="equipment-results" class="equipment-results" aria-label="نتائج البحث" hidden></ul>`;
 const equipmentQuery = document.getElementById('equipment-query');
 const equipmentResults = document.getElementById('equipment-results');
 const equipmentSearchStatus = document.getElementById('equipment-search-status');
 let equipmentMatches = [];
-const equipmentLocation = entry => `${rowNames[1]} · الصف 1 · الجهة A · القسم ${pad(entry.box.bay)} · المستوى ${entry.box.level} · الصندوق ${entry.box.label} (${entry.box.position} في الموقع)`;
+const equipmentLocation = entry => `${rowNames[entry.box.row||1]} · الصف ${entry.box.row||1} · الجهة ${entry.box.side||'A'} · القسم ${pad(entry.box.bay)} · المستوى ${entry.box.level} · الصندوق ${entry.box.label} (${entry.box.position} في الموقع)`;
 function updateEquipmentResults() {
   equipmentMatches = findEquipment(equipmentQuery.value);
   const hasQuery = Boolean(normalizeEquipmentName(equipmentQuery.value));
@@ -43,7 +45,7 @@ function updateEquipmentResults() {
   equipmentSearchStatus.textContent = !hasQuery ? '' : equipmentMatches.length ? `${equipmentMatches.length} نتيجة — اختر المعدة لفتح صندوقها.` : 'لا توجد معدات مطابقة في البيانات المسجلة.';
   equipmentResults.innerHTML = equipmentMatches.map((entry, index) => {
     const item = entry.item;
-    return `<li><button type="button" data-equipment-result="${index}"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(equipmentLocation(entry))}</span>${entry.parentName ? `<span>ضمن: ${escapeHtml(entry.parentName)}</span>` : ''}${item.quantity != null ? `<span>الكمية: ${escapeHtml(item.quantity)}</span>` : ''}${item.sourceCode ? `<span>رمز المعدة في الكشف: <bdi>${escapeHtml(item.sourceCode)}</bdi></span>` : ''}${item.notes ? `<span>ملاحظات: ${escapeHtml(item.notes)}</span>` : ''}</button></li>`;
+    return `<li><button type="button" data-equipment-result="${index}"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(equipmentLocation(entry))}</span>${entry.parentName ? `<span>ضمن: ${escapeHtml(entry.parentName)}</span>` : ''}${item.quantity != null ? `<span>الكمية: ${escapeHtml(item.quantity)}</span>` : ''}${item.sourceCode ? `<span>رمز المعدة في الكشف: <bdi>${escapeHtml(item.sourceCode)}</bdi></span>` : ''}${item.notes ? `<span>ملاحظات: ${escapeHtml(item.notes)}</span>` : ''}</button>${window.warehouseSearchActions?window.warehouseSearchActions(entry):''}</li>`;
   }).join('');
 }
 equipmentQuery.addEventListener('input', updateEquipmentResults);
@@ -85,7 +87,7 @@ equipmentResults.addEventListener('click', async event => {
   try {
     if (app.querySelector('.rb-stage') && rbScene.open) await rbSetOpen(false);
     if (state.open) await setOpen(false);
-    Object.assign(state, { row: 1, side: 'A', bay: entry.box.bay, level: entry.box.level, box: entry.box.id, view: 'case', open: false });
+    Object.assign(state, { row: entry.box.row||1, side: entry.box.side||'A', bay: entry.box.bay, level: entry.box.level, box: entry.box.id, view: 'case', open: false });
     Object.assign(rbScene, { boxId: entry.box.id, open: false, page: Math.floor(entry.mainIndex / rbPageSize) });
     renderBravo();
     const group = app.querySelectorAll('.rb-inventory > li')[entry.mainIndex];
