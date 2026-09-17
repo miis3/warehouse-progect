@@ -1,6 +1,6 @@
 # حالة المشروع
 
-آخر تحديث: 2026-09-17
+آخر تحديث: 2026-09-18
 
 ## الحالة الحالية
 
@@ -30,6 +30,8 @@ Baseline عند `cb0a96c`:
 - Supabase CLI `2.117.0` اكتشف الأوامر وأنشأ migration الجديد.
 
 Docker Desktop غير مثبت وPostgreSQL المحلي لـSupabase غير شغال على جهاز العمل؛ لذلك تعذر محليًا `docker compose` و`supabase migration list/advisors --local`. Workflow CI يبني الحاوية ويجري smoke test فعليًا بعد الرفع، بينما اختبارات PGlite طبقت كل migrations ونجحت.
+
+GitHub Actions على commit التنفيذ `03280c6`: التشغيل `35284438985` مكتمل بنجاح؛ job `test` وjob `container` كلاهما ناجحان، بما في ذلك Compose validation وبناء الصورة وhealth/UI/config smoke tests. لم يعمل Workflow النشر لأن الفرع ليس `main`.
 
 ## قرارات ثابتة
 
