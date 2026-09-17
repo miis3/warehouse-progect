@@ -1,0 +1,44 @@
+name: Deploy warehouse to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'warehouse-project/site/dist/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Verify website entry point and search assets
+        run: |
+          test -s warehouse-project/site/dist/index.html
+          test -s warehouse-project/site/dist/app.js
+          test -s warehouse-project/site/dist/equipment-search.js
+          test -s warehouse-project/site/dist/equipment-search.css
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload website only
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: warehouse-project/site/dist
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
