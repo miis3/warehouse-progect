@@ -43,6 +43,13 @@
 - الحاوية read-only، بلا امتيازات إضافية عدا bind، ومع `no-new-privileges` وhealthcheck.
 - عمليات API `POST` فقط، JSON بحد 100KB، مع rate limits و`Cache-Control: no-store`.
 
+## نسخة الاختبار المحلية
+
+- `npm run preview:test` يرتبط بـ`127.0.0.1` فقط، ولا يعرض الخدمة على الشبكة المحلية.
+- لا يقرأ `.env` ولا Supabase keys ولا يتصل بخدمة بعيدة؛ قاعدة PGlite مؤقتة في الذاكرة.
+- كلمة مرور `Warehouse-Preview-2026!` fixture معلنة للاختبار ولا تستخدم خارج Preview.
+- يقدم نفس CSP ورؤوس منع التخزين/clickjacking الأساسية، ويعيد إنشاء البيانات عند كل تشغيل.
+
 ## نتائج المراجعة
 
 - Secrets: لا يوجد secret جديد، ولا service role في browser/container.

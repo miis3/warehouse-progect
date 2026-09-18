@@ -2,6 +2,24 @@
 
 لا تنشر هذه الخطوات الموقع الحي تلقائيًا. Compose يشغل نسخة محلية/ذاتية، وGitHub Actions في هذا الفرع للاختبار فقط.
 
+## نسخة اختبار فورية ومعزولة
+
+لا تحتاج Docker أو Supabase credentials:
+
+```powershell
+npm ci --ignore-scripts
+npm run preview:test
+```
+
+افتح `http://127.0.0.1:8000`. بيانات الإدارة المحلية:
+
+```text
+username: preview-admin
+password: Warehouse-Preview-2026!
+```
+
+للعامل استخدم أي اسم عربي ورقم جديد مثل `70001`، وابحث عن `منشار`. استخدم نافذتين/متصفحين لأن جلسة كل صفحة محفوظة في الذاكرة. أوقف الخادم بـ`Ctrl+C` لحذف جميع بيانات التجربة.
+
 ## أسرع تشغيل على Windows
 
 المتطلب: Docker Desktop يعمل بوضع Linux containers.

@@ -13,6 +13,17 @@ Start-Process http://localhost:8080
 
 ضع في `.env` رابط Supabase وpublishable key فقط. **لا تضع `service_role` أو secret key.** للتفاصيل وHTTPS والإيقاف راجع [DEPLOYMENT.md](DEPLOYMENT.md).
 
+## نسخة اختبار محلية كاملة
+
+لتجربة العامل والأمين والاستلام والإرجاع دون Docker أو بيانات حقيقية:
+
+```powershell
+npm ci --ignore-scripts
+npm run preview:test
+```
+
+افتح `http://127.0.0.1:8000`. حساب الإدارة المحلي: `preview-admin` وكلمة المرور `Warehouse-Preview-2026!`. ابحث بحساب العامل عن `منشار`. تتلف كل بيانات التجربة عند إيقاف الخادم.
+
 ## التحقق
 
 ```powershell

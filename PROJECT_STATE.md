@@ -8,6 +8,7 @@
 - `main` والنشر الحي لم يتغيرا.
 - الواجهة العربية RTL الحالية محفوظة مع الخريطة والصناديق والبحث والصور وQR/الباركود.
 - التطبيق قابل للبناء كحاوية Caddy وتشغيله عبر Docker Compose على Windows.
+- توجد نسخة اختبار محلية معزولة عبر `npm run preview:test`: تستخدم PGlite في الذاكرة، نفس migrations وEdge handler، وحساب مدير/قطعة جاهزين لتجربة دورة العهدة كاملة دون Supabase بعيد.
 - قاعدة البيانات هي Supabase/PostgreSQL الحالية، والخدمة الخلفية هي `warehouse-api` Edge Function. لم تُنفذ أي عملية على قاعدة بعيدة ولم تتغير بيانات حقيقية.
 - Next.js غير معتمد: إعادة كتابة الواجهة الحالية لن تضيف فائدة تساوي خطر كسر السلوك القائم. القرار موثق في `ARCHITECTURE.md`.
 
@@ -28,6 +29,8 @@ Baseline عند `cb0a96c`:
 - `git diff --check`: ناجح (تحذيرات تحويل LF/CRLF فقط من إعداد Git على Windows).
 - Prettier لفات YAML/JSON: ناجح.
 - Supabase CLI `2.117.0` اكتشف الأوامر وأنشأ migration الجديد.
+- اختبار Preview عبر HTTP أكمل دورة الدخول والاستلام والاعتماد والإرجاع والسجل بنجاح.
+- المجموعة النهائية بعد إضافة Preview: `19/19` ناجحة، وhealth/page/config checks أعادت `200` دون اتصال Supabase، ولا توجد أخطاء أو تحذيرات في Console عند فتح الصفحة الفعلية.
 
 Docker Desktop غير مثبت وPostgreSQL المحلي لـSupabase غير شغال على جهاز العمل؛ لذلك تعذر محليًا `docker compose` و`supabase migration list/advisors --local`. Workflow CI يبني الحاوية ويجري smoke test فعليًا بعد الرفع، بينما اختبارات PGlite طبقت كل migrations ونجحت.
 
@@ -36,6 +39,7 @@ GitHub Actions على commit التنفيذ `03280c6`: التشغيل `352844389
 ## قرارات ثابتة
 
 - لا أسرار في المستودع أو صورة Docker. `.env.example` يحتوي قيمًا بديلة فقط.
+- بيانات دخول Preview ثابتة واختبارية، تعمل فقط مع الخادم المحلي المعزول المرتبط بـ`127.0.0.1`، وليست اعتمادًا لأي بيئة حقيقية.
 - مفتاح Supabase القابل للنشر يمر من Caddy في `apikey`; لا يُرسل كمفتاح Bearer، ولا يصل `service_role` إلى المتصفح أو الحاوية.
 - Caddy موجود للاستخدام الفعلي: static hosting، same-origin reverse proxy، رؤوس أمنية، وHTTPS تلقائي عند توفير نطاق.
 - migrations السابقة لا تُعدّل. أي تحسين مخطط جديد additive وقابل للتراجع دون حذف بيانات.

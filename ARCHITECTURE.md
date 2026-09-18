@@ -38,6 +38,18 @@ Supabase PostgreSQL
 - `supabase/functions/warehouse-api`: حدود HTTP المحمولة والمختبرة. وحدها تقرأ `SUPABASE_SERVICE_ROLE_KEY` من بيئة Supabase.
 - `supabase/migrations`: المصدر القانوني للمخطط والصلاحيات وبيانات المخزون المصدرية.
 - `tests`: اختبارات قاعدة وEdge وواجهة ومخزون وموظفين وبنية إنتاج.
+- `scripts/test-preview.mjs`: محاكي تكامل محلي للاختبار اليدوي؛ يقدم الواجهة ويشغل نفس handler فوق PostgreSQL-compatible PGlite مؤقتة. لا يدخل مسار الإنتاج ولا يتصل بـSupabase.
+
+## مسار Preview المعزول
+
+```text
+Browser on 127.0.0.1:8000
+  -> local Node static/API adapter
+  -> production warehouse Edge handler
+  -> in-memory PGlite with all committed migrations
+```
+
+هذا المسار للاختبار اليدوي فقط. يعيد إنشاء قاعدة نظيفة في كل تشغيل، ويرتبط بالـloopback ولا يحتوي Supabase keys.
 
 ## قرار Next.js
 
