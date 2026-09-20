@@ -55,6 +55,9 @@ async function requestBody(request){
 export async function createTestPreview({host='127.0.0.1',port=8000}={}){
   const db=await database();
   const seeded=await seedPreview(db);
+  // Model Supabase Auth only inside this isolated preview process. The
+  // warehouse RPCs still enforce every staff role and session permission.
+  const authPasswords=new Map([[seeded.adminId,PREVIEW_ADMIN.password]]);
   const rpc=async(name,args)=>{
     const entries=Object.entries(args);
     const values=entries.map(([,value])=>typeof value==='object'?JSON.stringify(value):value);
@@ -114,8 +117,19 @@ export async function createTestPreview({host='127.0.0.1',port=8000}={}){
   handler=createWarehouseHandler({
     env:name=>name==='ALLOWED_ORIGINS'?origin:undefined,
     rpc,
-    authenticateAdmin:async(username,password)=>
-      username===PREVIEW_ADMIN.username&&password===PREVIEW_ADMIN.password?seeded.adminId:null
+    authenticateAdmin:async(username,password)=>{
+      const id=await rpc('warehouse_admin_identity',{p_username:username});
+      return id&&authPasswords.get(id)===password?id:null;
+    },
+    createAuthUser:async password=>{
+      const id=randomUUID();
+      authPasswords.set(id,password);
+      return id;
+    },
+    updateAuthPassword:async(id,password)=>{
+      if(!authPasswords.has(id))throw new Error('Preview staff identity missing');
+      authPasswords.set(id,password);
+    }
   });
   const close=async()=>{
     await new Promise((done,reject)=>server.close(error=>error?reject(error):done()));
