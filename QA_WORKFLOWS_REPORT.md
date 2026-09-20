@@ -56,6 +56,19 @@ Screenshots were captured in the task: linked maintenance ticket, six-unit box c
 
 ## Readiness verdict
 
+Final code CI at `48da504`: [run35488156791](https://github.com/miis3/warehouse-progect/actions/runs/35488156791) SUCCESS. Windows tests, Linux tests, and container Compose/build/smoke checks all passed. The earlier Windows line-ending failure is resolved, not skipped.
+
+## Changed files
+
+- Interface: `warehouse-project/site/dist/warehouse-management.js`, `warehouse-management.css`.
+- Backend/schema: `supabase/functions/warehouse-api/handler.mjs`, new `supabase/migrations/20260920032912_warehouse_workflows.sql`.
+- Windows/container: new `scripts/local-supabase.mjs`, `package.json`, `.env.example`, `compose.yaml`, `docker/Caddyfile`.
+- Source reproducibility: `scripts/prepare-inventory.mjs` (canonical line-ending hash only; source files and manifest untouched).
+- Tests: `tests/database.test.mjs`, `interface.test.mjs`, `inventory.test.mjs`, `production.test.mjs`, new `local-supabase.test.mjs` and `workflows.test.mjs`; `.github/workflows/warehouse-tests.yml`.
+- Truth/reporting: `AGENTS.md`, `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DATABASE.md`, `WORKFLOWS.md`, `SECURITY.md`, `DEPLOYMENT.md`, `CHANGELOG.md`, this report.
+
+## Operational handoff
+
 Implemented and validated for controlled staging trials. NOT signed off for live production: real authenticated staging journey still needs the owner's existing password, original stock quantities/conditions must be supplied truthfully, overdue threshold must be chosen by the manager, and multi-connection load/target-phone testing remain outstanding. Main and live site were not published.
 
 Start on Windows (Node24): `npm ci --ignore-scripts`, then `npm start`, open `http://127.0.0.1:8004/`. Existing admin username: `admin`; use its current password, not the isolated preview fixture.

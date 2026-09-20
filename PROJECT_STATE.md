@@ -29,6 +29,7 @@
 - تشغيل CI الأول `35488002400` نجح في Linux والحاوية، وكشف اختلاف بصمة مصدر المخزون على Windows بسبب CRLF. صحح احتساب SHA256 إلى LF canonical مع اختبار اختلاف نهايات الأسطر وكشف تعديل المحتوى الحقيقي؛ لم يتغير المصدر أو manifest أو بيانات المستودع.
 - Docker غير متوفر على Windows المحلي. CI على الفرع يختبر Windows وLinux ويبني حاوية Caddy ويفحصها دون نشر. تُسجّل نتيجة آخر تشغيل في تقرير التسليم.
 - التقرير التفصيلي: `QA_WORKFLOWS_REPORT.md`. تقرير `QA_REPORT.md` يخص التحقق السابق قبل هذه الترقية.
+- GitHub Actions على `48da504`: التشغيل [35488156791](https://github.com/miis3/warehouse-progect/actions/runs/35488156791) اكتمل بنجاح في `test (windows-latest)` و`test (ubuntu-latest)` و`container` (Compose/build/health/UI/config). لا نشر حي.
 
 ## حدود الجاهزية
 
