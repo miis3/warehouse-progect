@@ -14,7 +14,7 @@
 		reverse_proxy {$SUPABASE_URL} {
 			header_up Host {upstream_hostport}
 			header_up -Origin
-			header_up -Authorization
+			header_up Authorization "Bearer {$SUPABASE_ANON_KEY}"
 			header_up apikey {$SUPABASE_PUBLISHABLE_KEY}
 		}
 	}

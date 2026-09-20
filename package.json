@@ -9,6 +9,7 @@
     "test:database": "node --test tests/database.test.mjs",
     "test:production": "node --test tests/production.test.mjs",
     "preview:test": "node scripts/test-preview.mjs",
+    "start": "node --use-system-ca scripts/local-supabase.mjs",
     "check": "node scripts/check-source.mjs"
   },
   "devDependencies": {

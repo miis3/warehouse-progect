@@ -26,7 +26,8 @@ test('production truth files and container boundary stay complete',()=>{
   assert.match(caddy,/\/functions\/v1\/warehouse-api/);
   assert.match(caddy,/Content-Security-Policy/);
   assert.match(caddy,/frame-ancestors 'none'/);
-  assert.match(caddy,/header_up -Authorization/);
+  assert.match(caddy,/header_up Authorization "Bearer \{\$SUPABASE_ANON_KEY\}"/);
+  assert.match(compose,/SUPABASE_ANON_KEY/);
   assert.doesNotMatch(caddy,/Bearer \{\$SUPABASE_PUBLISHABLE_KEY\}/);
   assert.doesNotMatch(caddy,/SERVICE_ROLE|sb_secret_/i);
 

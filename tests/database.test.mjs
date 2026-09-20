@@ -101,12 +101,12 @@ test('PostgreSQL: real inventory, authorization, issue/return, immutable history
    await assert.rejects(call(k,'review_request',{id:req.id,decision:'approve',inspections:units.map(u=>({unit_id:u.unit_id,condition:'sound',notes:''}))}),/لم تعد متاحة/);
    assert.equal((await call(a,'loans')).length,0);assert.equal((await call(a,'requests',{status:'pending'}))[0].status,'pending');
    await call(k,'review_request',{id:req.id,decision:'reject',notes:'عطل في أحد المحتويات'});
-   await assert.rejects(call(a,'request',{kind:'checkout',box_id:manifest.boxes.find(b=>b.contents_missing).id,client_key:randomUUID()}),/مراجعة جميع/);
+   await assert.rejects(call(a,'request',{kind:'checkout',box_id:manifest.boxes.find(b=>b.contents_missing).id,client_key:randomUUID()}),/غير مكتملة/);
  });
  await t.test('inventory updates retain IDs, persist after new sessions and write audit events',async()=>{
    const loc=manifest.locations.find(l=>l.row===5);
    const box=await call(k,'save_box',{label:'صندوق اختبار',location_id:loc.id,position:1});
-   const added=await call(k,'save_item',{box_id:box.id,name:'معدة اختبار مؤقتة',notes:'بيئة الاختبار فقط'});
+   const added=await call(k,'save_item',{box_id:box.id,name:'معدة اختبار مؤقتة',quantity:1,condition:'sound',notes:'بيئة الاختبار فقط'});
    await call(k,'save_item',{id:added.id,box_id:box.id,name:'اسم معدل',notes:'تعديل'});
    await call(k,'save_box',{id:box.id,label:'صندوق اختبار معدل',location_id:manifest.locations[0].id,position:1});
    assert.ok((await call(k,'audit',{item_id:added.id})).some(e=>e.operation==='equipment_updated'));

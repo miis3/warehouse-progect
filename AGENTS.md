@@ -20,6 +20,8 @@ At the end of every significant task, update every truth file affected by the wo
 
 - Preserve the Arabic RTL interface, map, boxes, search, images, QR/barcode behavior, inventory source files, and established workflows unless a task explicitly authorizes a change.
 - Treat `warehouse-project/inputs`, committed migrations, and audit/loan history as append-only source records. Never run destructive migrations or mutate production data as part of routine development.
+- Do not seed synthetic accounts, stock, loans or audit events into an operational/Supabase environment. Test fixtures belong only in explicitly isolated disposable test databases. Never restart an existing in-memory preview containing user trial data without addressing data loss.
+- There is no periodic stock review. Quantity/condition are initial item data and change only through authorized actual operations. Never guess missing initial stock, equipment condition, or the manager's overdue threshold.
 - Create database migrations with the Supabase CLI; do not edit migrations that have already been applied. Test schema behavior against an isolated database before any remote operation.
 - Keep `SUPABASE_SERVICE_ROLE_KEY`, secret API keys, passwords, setup tokens, and session tokens out of browser code, Docker build arguments, logs, fixtures, and Git history.
 - The browser may use only a Supabase publishable/legacy anon key. Privileged database access belongs to the Supabase Edge Function environment.

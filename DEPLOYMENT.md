@@ -2,7 +2,23 @@
 
 لا تنشر هذه الخطوات الموقع الحي تلقائيًا. Compose يشغل نسخة محلية/ذاتية، وGitHub Actions في هذا الفرع للاختبار فقط.
 
-## نسخة اختبار فورية ومعزولة
+## التشغيل الحالي على Windows — Supabase حقيقي دون بيانات وهمية
+
+المتطلب Node.js 24. من مجلد المستودع:
+
+```powershell
+git switch codex/production-ready-windows
+npm ci --ignore-scripts
+npm start
+```
+
+افتح `http://127.0.0.1:8004/`. الأمر يستخدم مخزن شهادات Windows مع التحقق من TLS، ويتصل بمشروع staging المحدد في `warehouse-project/site/dist/warehouse-config.js` بمفتاح anon العام فقط. لا ينشئ حسابًا أو مخزونًا أو عهدة تلقائيًا، وإيقافه لا يحذف بيانات Supabase. الافتراضي 8004 لتفادي خوادم التجربة السابقة؛ يمكن تغييره عبر `WAREHOUSE_LOCAL_PORT`.
+
+اختر «دخول الإدارة»، اسم المستخدم الموجود `admin`، وكلمة مروره الحالية التي وضعها صاحب الحساب. لا تستخدم كلمة مرور Preview هنا. بعد الدخول: حدد المدة من «إعداد التأخير»، واستكمل العدد والحالة الأوليين للأصناف المستوردة غير المكتملة من «المعدات والصناديق ← تعديل بيانات المعدة». لا تُعدّ هذه مراجعة دورية ولا تُكرر بعد الحفظ.
+
+Supabase staging طبق migrations حتى `20260920032912` وEdge Function الإصدار 2 في 2026-09-20. البيانات الأصلية بقيت كما هي؛ تشغيل الفرع محليًا لا ينشر GitHub Pages. لا تستخدم المنفذين القديمين 8000/8002 كبديل لهذه النسخة الدائمة؛ هما محاكيان مؤقتان قديمان.
+
+## أداة QA معزولة فقط — ليست تشغيل النظام
 
 لا تحتاج Docker أو Supabase credentials:
 
@@ -46,6 +62,9 @@ Start-Process http://localhost:8080
 
 - `SUPABASE_URL`: رابط مشروع Supabase، مثل `https://project-ref.supabase.co`.
 - `SUPABASE_PUBLISHABLE_KEY`: publishable key أو legacy anon key العام. لا تستخدم service role أو secret key.
+- `SUPABASE_ANON_KEY`: legacy anon JWT العام من Settings → API Keys → Legacy API keys → anon؛ تحتاجه البوابة `verify_jwt=true` في Authorization حتى مع publishable apikey. هذا ليس service_role. إن استخدمت legacy anon في المفتاح الأول يمكن تكراره هنا.
+
+هذا الحقل الجديد يصحح فشل API 401 في إعداد Caddy القديم الذي كان يرسل apikey وحده. لا تعطل `verify_jwt` لعلاج المشكلة.
 
 الفحص والإيقاف:
 

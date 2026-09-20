@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {startLocalSupabase} from '../scripts/local-supabase.mjs';
+test('Windows local server uses only the configured Supabase upstream and never seeds data',async t=>{
+ const calls=[];
+ const key=Buffer.from('{"alg":"HS256"}').toString('base64url')+'.'+Buffer.from('{"role":"anon"}').toString('base64url')+'.invalid-test-signature';
+ const config={apiUrl:'https://example.supabase.co/functions/v1/warehouse-api',gatewayKey:key};
+ const app=await startLocalSupabase({port:0,config,fetchImpl:async(url,options)=>{calls.push({url:String(url),options});return new Response('{"data":{"ok":true}}');}});t.after(()=>app.close());
+ assert.equal(calls.length,0);
+ const page=await fetch(app.origin);assert.equal(page.status,200);assert.match(await page.text(),/المستودع التفاعلي/);
+ const runtime=await(await fetch(app.origin+'/warehouse-config.js')).text();assert.match(runtime,/\/api\/warehouse/);assert.ok(!runtime.includes(config.gatewayKey));
+ assert.equal((await fetch(app.origin+'/api/warehouse',{method:'POST',headers:{Origin:'https://evil.invalid','Content-Type':'application/json'},body:'{}'})).status,403);
+ assert.equal(calls.length,0);
+ const response=await fetch(app.origin+'/api/warehouse',{method:'POST',headers:{Origin:app.origin,'Content-Type':'application/json','X-Warehouse-Session':'isolated-session'},body:JSON.stringify({action:'public_catalog'})});
+ assert.equal(response.status,200);assert.equal(calls.length,1);assert.equal(calls[0].url,config.apiUrl);
+ assert.equal(calls[0].options.headers['X-Warehouse-Session'],'isolated-session');assert.equal(calls[0].options.headers.Origin,undefined);
+ assert.equal(calls[0].options.headers.Authorization,'Bearer '+key);
+ assert.equal((await fetch(app.origin+'/api/warehouse')).status,405);
+ await assert.rejects(startLocalSupabase({port:0,config:{...config,gatewayKey:'sb_secret_forbidden'}}),/public/);
+});

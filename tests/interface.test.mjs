@@ -36,7 +36,7 @@ test('Arabic interface: real inventory search, inspection, approval, return, per
  assert.ok(item);const box=manifest.boxes.find(b=>b.id===item.box_id);
  click(a,'[data-wh-view="inventory"]');await until(()=>a.document.querySelector('#wh-inventory-box'),'Inventory did not load');
  const select=a.document.querySelector('#wh-inventory-box');select.value=box.id;select.dispatchEvent(new a.Event('change',{bubbles:true}));
- click(a,`[data-wh-review-item="${item.id}"]`);fill(a,'dialog [name=quantity]','1');fill(a,'dialog [name=condition]','sound');submit(a,'dialog form');
+ click(a,`[data-wh-edit-item="${item.id}"]`);fill(a,'dialog [name=quantity]','1');fill(a,'dialog [name=condition]','sound');submit(a,'dialog form');
  await until(()=>!a.document.querySelector('dialog'),'Review failed');
  // Re-login reloads server inventory; no local storage is used.
  click(w,'[data-wh-logout]');await until(()=>!w.WarehouseService.user,'Logout failed');await login(w);
@@ -50,17 +50,17 @@ test('Arabic interface: real inventory search, inspection, approval, return, per
  click(w,`#app [data-wh-borrow="${item.id}"]`);const unit=w.document.querySelector('dialog input[name=unit_ids]');assert.ok(unit);unit.checked=true;submit(w,'dialog form');
  await until(()=>!w.document.querySelector('dialog'),'Request failed');
  click(a,'[data-wh-view="requests"]');await until(()=>a.document.querySelector('[data-wh-approve]'),'Pending request missing');
- click(a,'[data-wh-approve]');fill(a,'dialog [name=condition-0]','sound');submit(a,'dialog form');await until(()=>!a.document.querySelector('dialog'),'Approval failed');
+ click(a,'[data-wh-approve]');submit(a,'dialog form');await until(()=>!a.document.querySelector('dialog'),'Approval failed');
  click(w,'[data-wh-view="custody"]');await until(()=>w.document.querySelector('[data-wh-return]'),'Custody missing');
  assert.match(w.document.querySelector('#warehouse-panel').textContent,/حالة الخروج: سليمة/);
  click(w,'[data-wh-return]');submit(w,'dialog form');await until(()=>!w.document.querySelector('dialog'),'Return request failed');
  click(a,'[data-wh-refresh]');await until(()=>a.document.querySelector('[data-wh-approve]'),'Return approval missing');click(a,'[data-wh-approve]');
- fill(a,'dialog [name=condition-0]','needs_maintenance');fill(a,'dialog [name=notes-0]','ملاحظة فحص اختبارية في قاعدة مؤقتة');submit(a,'dialog form');await until(()=>!a.document.querySelector('dialog'),'Return approval failed');
+ fill(a,'dialog [name=return_condition]','needs_maintenance');fill(a,'dialog [name=notes]','ملاحظة فحص اختبارية في قاعدة مؤقتة');submit(a,'dialog form');await until(()=>!a.document.querySelector('dialog'),'Return approval failed');
  click(w,'[data-wh-refresh]');await until(()=>w.document.querySelector('[data-wh-history="true"]')&&!w.document.querySelector('[data-wh-return]'),'Returned unit still in current custody');
  click(w,'[data-wh-history="true"]');await until(()=>w.document.querySelector('#warehouse-panel').textContent.includes('حالة الإرجاع:'),'History missing');
  assert.match(w.document.querySelector('#warehouse-panel').textContent,/حالة الخروج: سليمة/);
  assert.match(w.document.querySelector('#warehouse-panel').textContent,/حالة الإرجاع: بها عطل وتحتاج صيانة/);
- click(a,'[data-wh-view="map"]');click(a,'[data-action="rb001"]');await until(()=>a.document.querySelector('.rb-stage'),'Existing RB-001 shortcut stopped working');
+ click(a,'[data-wh-view="map"]');await until(()=>!a.document.querySelector('#app').hidden,'Map missing');click(a,'[data-action="rb001"]');await until(()=>a.document.querySelector('.rb-stage'),'Existing RB-001 shortcut stopped working');
  const publicPage=page('#box='+box.id);await until(()=>publicPage.document.querySelector('.rb-stage'),'Public QR did not open case');
  assert.equal(publicPage.WarehouseService.user,null);assert.ok(!publicPage.document.body.textContent.includes('54321'));
  click(publicPage,'[data-wh-qr]');assert.match(publicPage.document.querySelector('dialog img').src,/^data:image\/gif;base64,/);

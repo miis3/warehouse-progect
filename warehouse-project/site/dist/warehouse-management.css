@@ -27,4 +27,5 @@
 .wh-inspection legend{padding:0 7px}.wh-inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.wh-qr{text-align:center}.wh-qr img{display:block;width:240px;max-width:100%;margin:18px auto;background:white;padding:12px}.wh-qr a{color:var(--cyan);overflow-wrap:anywhere}
 #warehouse-notice{color:var(--cyan);min-height:0}#warehouse-notice:empty{margin:0;padding:0}.wh-danger{color:#ffb99b!important}.wh-empty{padding:25px;color:var(--muted);text-align:center}
 .wh-unit-detail{padding:10px 0;border-top:1px solid var(--line)}.wh-busy{opacity:.7;pointer-events:none}
+.wh-json{white-space:pre-wrap;overflow-wrap:anywhere;direction:ltr;text-align:left;font-size:12px}#wh-alerts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}#wh-alerts:empty{display:none}.wh-status[data-status="retired"]{color:var(--muted)}
 @media(max-width:600px){#warehouse-access,#warehouse-tools,#warehouse-panel,#warehouse-notice{padding:0 14px}.wh-login{margin:28px auto;padding:22px}.wh-toolbar{gap:7px}.wh-toolbar button{padding:9px 11px;font-size:14px;min-height:44px}.wh-toolbar .wh-user{width:100%}.wh-panel{padding:16px}.wh-dialog{padding:18px}}

@@ -1,12 +1,12 @@
 # Security
 
-آخر مراجعة: 2026-09-17
+آخر مراجعة: 2026-09-20
 
 ## الأسرار والمفاتيح
 
 - ممنوع وضع `SUPABASE_SERVICE_ROLE_KEY`, `sb_secret_*`, كلمات المرور، setup/session tokens، أو database URLs في Git أو browser أو Docker build args.
 - `.env` متجاهل. `.env.example` قيم بديلة فقط.
-- الحاوية تقرأ `SUPABASE_PUBLISHABLE_KEY` الآمن للنشر وترسله في `apikey` فقط. لا ترسله كـBearer لأن مفاتيح `sb_publishable_*` ليست JWT.
+- الحاوية ترسل `SUPABASE_PUBLISHABLE_KEY` العام في `apikey`، و`SUPABASE_ANON_KEY` (JWT anon العام فقط) في Bearer للبوابة الحالية. لا يُرسل `sb_publishable_*` كـBearer ولا يُستخدم أي مفتاح امتياز. اختبار staging كشف أن apikey وحده يرجع 401.
 - Edge Function وحدها تقرأ `SUPABASE_SERVICE_ROLE_KEY` من بيئة Supabase. المفتاح القديم `anon` في نسخة Pages عام وليس سرًا، لكن الانتقال إلى publishable key موصى به عند دورة النشر التالية.
 
 ## Auth وJWT والجلسات
@@ -39,7 +39,7 @@
 
 ## حدود الشبكة والحاوية
 
-- Caddy يقبل endpoint واحدًا للـAPI ويحذف `Origin` و`Authorization` القادمين قبل proxy، ثم يضيف publishable `apikey` من بيئته.
+- Caddy يقبل endpoint واحدًا ويحذف `Origin` ويستبدل `Authorization` القادم بالـanon JWT العام، ويضيف publishable `apikey` من بيئته.
 - الحاوية read-only، بلا امتيازات إضافية عدا bind، ومع `no-new-privileges` وhealthcheck.
 - عمليات API `POST` فقط، JSON بحد 100KB، مع rate limits و`Cache-Control: no-store`.
 
@@ -52,6 +52,12 @@
 - يقدم نفس CSP ورؤوس منع التخزين/clickjacking الأساسية، ويعيد إنشاء البيانات عند كل تشغيل.
 
 ## نتائج المراجعة
+
+- جداول settings والصيانة الجديدة مغلقة بـRLS/deny-all/revoked grants؛ settings للمدير فقط، والصيانة للمخولين فقط. RPC القديم صار خاصًا ولا يسمح service_role بتنفيذه مباشرة. تحقق ذلك على staging نفسها بعد الترقية.
+- إغلاق الصيانة يقفل القطعة ثم يعيد التحقق من بقاء البلاغ مفتوحًا؛ إرجاع الصندوق يراجع ملكية طلب الصرف الأصلي. الطلب/الاعتماد والاستبعاد لا يسمح بتجاوز القطع المعارة أو المتعطلة.
+- بلاغ الصيانة append-only باستثناء إغلاق واحد؛ تعديل محتوياته القديمة أو حذفه ممنوع بـtrigger. Audit السابق لم يتغير.
+- `npm start` يستخدم proxy loopback بمقصد Supabase HTTPS ثابت، ومفتاح anon عام فقط، وفحص Host/Origin و100KB وTLS/timeout. لا بذور بيانات ولا محاكاة هوية. `--use-system-ca` يستخدم الشهادات الموثوقة في Windows ولا يعطل التحقق منها.
+- مستشار Supabase في 2026-09-20 أعاد تحذير Auth فقط: حماية كلمات المرور المسرّبة معطلة. لم تُغيّر الخطة أو تُضف تكلفة. [المتطلبات وطريقة التفعيل](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
 
 - Secrets: لا يوجد secret جديد، ولا service role في browser/container.
 - Auth/JWT: الحدود صحيحة؛ مخاطر worker login موثقة.

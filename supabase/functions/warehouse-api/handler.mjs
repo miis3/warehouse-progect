@@ -2,7 +2,8 @@
 // No browser-held service key and no local-storage authentication.
 export const PRIVATE_ACTIONS = new Set(['session','logout','catalog','loans','requests','audit','request','cancel_request',
   'review_request','review_item','add_units','set_condition','save_box','save_item','workers','set_worker_active',
-  'staff_list','staff_update','create_staff','change_password']);
+  'staff_list','staff_update','create_staff','change_password','custody','settings','save_settings','dashboard','overdue',
+  'maintenance','close_maintenance','retire_unit','initialize_stock']);
 const encoder = new TextEncoder();
 export async function digest(value) {
   const hash = await crypto.subtle.digest('SHA-256', encoder.encode(value));

@@ -12,6 +12,7 @@ Caddy container
   - security headers and compression
   - optional automatic HTTPS
   - adds only the Supabase publishable key
+  - adds a public legacy anon JWT for the verified Edge gateway
         |
         | HTTPS /functions/v1/warehouse-api
         v
@@ -39,6 +40,9 @@ Supabase PostgreSQL
 - `supabase/migrations`: المصدر القانوني للمخطط والصلاحيات وبيانات المخزون المصدرية.
 - `tests`: اختبارات قاعدة وEdge وواجهة ومخزون وموظفين وبنية إنتاج.
 - `scripts/test-preview.mjs`: محاكي تكامل محلي للاختبار اليدوي؛ يقدم الواجهة ويشغل نفس handler فوق PostgreSQL-compatible PGlite مؤقتة. لا يدخل مسار الإنتاج ولا يتصل بـSupabase.
+- `scripts/local-supabase.mjs`: تشغيل Windows مباشر عبر `npm start`، static/proxy محدود على loopback8004، يتصل بقاعدة Supabase الموجودة بمفتاح anon العام دون محاكاة Auth أو زرع بيانات. لا تبقى أي بيانات تشغيلية في Node.
+- الإضافة الجديدة تبقي كل تغييرات العهد/الكميات/الحالات/الصيانة/السجل في معاملات PostgreSQL، وتعيد استخدام RPC القديم داخليًا. الواجهة تعرض مجموعات الصناديق وتتنبه كل 30 ثانية للطلبات والتأخير.
+- Docker يحتاج مفتاح API عام ومفتاح anon JWT عام للبوابة `verify_jwt=true`؛ ليس أي منهما service_role. Caddy يستبدل Authorization العميل بالـanon العام المهيأ، ولا يسمح بتمرير اعتماد امتياز من المتصفح.
 - في Preview فقط، محاكي Supabase Auth يحتفظ بهويات الإدارة الاختبارية وكلمات مرورها في ذاكرة العملية؛ إنشاء الحساب وتغييره يمران عبر Edge handler وRPC الحقيقيين، بينما تعود قرارات الدور والجلسة إلى قاعدة PGlite. لا يستخدم هذا المحاكي في الإنتاج.
 
 ## مسار Preview المعزول
