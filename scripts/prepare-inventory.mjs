@@ -6,6 +6,9 @@ import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = path => readFileSync(resolve(root, path), 'utf8');
+// Git checkouts may translate LF to CRLF on Windows. Hash canonical Git text,
+// not the checkout's line-ending convention; preserve the existing source digest.
+export const inventorySourceHash = raw => createHash('sha256').update(raw.replace(/\r\n/g,'\n')).digest('hex');
 // Stable UUIDs derive from the ORIGINAL imported identity, never the current label/location.
 export function stableId(key) {
   const b = createHash('sha1').update('warehouse-progect:inventory:v1:' + key).digest().subarray(0, 16);
@@ -40,7 +43,7 @@ export function prepareInventory() {
     }
     visit(content?.items || []);
   })));
-  return {version:1,source:'R-A.xlsx / كشف تحميل برافو.xlsx',source_sha256:createHash('sha256').update(raw).digest('hex'),locations,boxes,items};
+  return {version:1,source:'R-A.xlsx / كشف تحميل برافو.xlsx',source_sha256:inventorySourceHash(raw),locations,boxes,items};
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const data = prepareInventory();

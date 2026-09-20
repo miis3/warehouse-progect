@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { prepareInventory } from '../scripts/prepare-inventory.mjs';
+import { prepareInventory, inventorySourceHash } from '../scripts/prepare-inventory.mjs';
 
 test('migration retains every located source record and distinct duplicate box', () => {
   const m = prepareInventory();
@@ -16,4 +16,7 @@ test('migration retains every located source record and distinct duplicate box',
     if(i.parent_id) assert.ok(m.items.some(p=>p.id===i.parent_id&&p.box_id===i.box_id));
   }
   assert.deepEqual(m,JSON.parse(readFileSync(new URL('../warehouse-project/data/inventory-manifest.json',import.meta.url))));
+  const raw=readFileSync(new URL('../warehouse-project/site/dist/bravo-contents.js',import.meta.url),'utf8').replace(/\r\n/g,'\n');
+  assert.equal(inventorySourceHash(raw.replace(/\n/g,'\r\n')),m.source_sha256,'Windows checkout must preserve source identity');
+  assert.notEqual(inventorySourceHash(raw+'changed'),m.source_sha256,'Actual source changes must still be detected');
 });

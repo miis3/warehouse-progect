@@ -44,6 +44,7 @@ Screenshots were captured in the task: linked maintenance ticket, six-unit box c
 3. Previous Caddy forwarded only apikey: actual gateway probe returned `401 UNAUTHORIZED_NO_AUTH_HEADER`. Added separate public anon JWT for verified gateway Authorization; never a service-role key. Docker cannot run on this Windows machine; CI validates/builds/smoke-tests the container.
 4. Browser selector timing/label lookup during QA: re-observed UI and selected the existing stable inventory control; no product defect or console error.
 5. Repeat-run interface test caught a login/map refresh race that could replace a quickly opened box. Login now unlocks only after initial navigation completes; map refresh hides stale interactive content while loading. Full tests and real browser login/search/box-opening were rerun after the fix.
+6. First matrix CI run `35488002400`: Linux and container PASS, Windows failed only source-digest equality because Git converted LF to CRLF. Canonical LF hashing now preserves the original committed digest across platforms; regression assertions cover both line endings and detection of real content edits. No source data/manifest/migration was regenerated or changed.
 
 ## Remote verification
 
